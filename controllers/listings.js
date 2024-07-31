@@ -70,8 +70,26 @@ router.delete('/:listingId', async (req, res) => {
 //GET edit route
 router.get('/:listingId/edit', async (req, res) => {
     try {
-        console.log('listingId: ', req.params.listingId);
-        res.send(`Listings edit view`);
+        const currentListing = await Listing.findById(req.params.listingId);
+        res.render('listings/edit.ejs', {
+            listing: currentListing,
+        });
+    } catch (error) {
+        console.log(error);
+        res.redirect('/');
+    }
+});
+
+//PUT update route
+router.put('/:listingId', async (req, res) => {
+    try {
+        const currentListing = await Listing.findById(req.params.listingId);
+        if(currentListing.owner.equals(req.session.user._id)) {
+            await currentListing.updateOne(req.body);
+            res.redirect('/listings');
+        } else {
+            res.send("You don't have permission to do that.")
+        }
     } catch (error) {
         console.log(error);
         res.redirect('/');
