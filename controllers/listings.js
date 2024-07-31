@@ -51,5 +51,31 @@ router.get('/:listingId', async (req, res) => {
     }
 });
 
+//DELETE route
+router.delete('/:listingId', async (req, res) => {
+    try {
+        const listing = await Listing.findById(req.params.listingId);
+        if (listing.owner.equals(req.session.user._id)) {
+            await listing.deleteOne();
+            res.redirect('/listings');
+        } else {
+            res.send("You don't have permission to do that.")
+        }
+    } catch (error) {
+        console.log(error);
+        res.redirect('/');
+    }
+});
+
+//GET edit route
+router.get('/:listingId/edit', async (req, res) => {
+    try {
+        console.log('listingId: ', req.params.listingId);
+        res.send(`Listings edit view`);
+    } catch (error) {
+        console.log(error);
+        res.redirect('/');
+    }
+});
 
 module.exports = router;
